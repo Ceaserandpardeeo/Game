@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Car Racing Game</title>
+<style>
+body {
+margin: 0;
+padding: 0;
+overflow: hidden;
+}
+
+canvas {
+display: block;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+// Set up the canvas
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Set up the car
+var car = {
+x: canvas.width / 2,
+y: canvas.height - 100,
+width: 50,
+height: 100,
+speed: 5
+};
+
+// Set up the obstacles
+var obstacles = [];
+var obstacleSpeed = 3;
+var obstacleInterval = 1000;
+var lastObstacleTime = 0;
+
+// Handle user input
+document.addEventListener("keydown", function(event) {
+if (event.code === "ArrowLeft") {
+car.x -= car.speed;
+} else if (event.code === "ArrowRight") {
+car.x += car.speed;
+}
+});
+
+// Update the game state
+function update() {
+// Move the obstacles
+for (var i = 0; i < obstacles.length; i++) {
+obstacles[i].y += obstacleSpeed;
+if (obstacles[i].y > canvas.height) {
+obstacles.splice(i, 1);
+i--;
+}
+}
+
+// Add new obstacles
+var currentTime = Date.now();
+if (currentTime - lastObstacleTime > obstacleInterval) {
+lastObstacleTime = currentTime;
+var obstacle = {
+x: Math.random() * (canvas.width - 50),
+y: -50,
+width: 50,
+height: 50
+};
+obstacles.push(obstacle);
+}
+
+// Check for collisions
+for (var i = 0; i < obstacles.length; i++) {
+if (car.x < obstacles[i].x + obstacles[i].width &&
+car.x + car.width > obstacles[i].x &&
+car.y < obstacles[i].y + obstacles[i].height &&
+car.y + car.height > obstacles[i].y) {
+alert("Game over!");
+location.reload();
+}
+}
+}
+
+// Draw the game
+function draw() {
+// Clear the canvas
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+// Draw the car
+ctx.fillStyle = "blue";
+ctx.fillRect(car.x, car.y, car.width, car.height);
+
+// Draw the obstacles
+ctx.fillStyle = "red";
+for (var i = 0; i < obstacles.length; i++) {
+ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
+}
+}
+
+// Game loop
+function loop() {
+update();
+draw();
+requestAnimationFrame(loop);
+}
+
+// Start the game loop
+loop();
+</script>
+</body>
+</html>
